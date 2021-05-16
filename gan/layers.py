@@ -73,7 +73,7 @@ class DenseEqualized(Layer):
         
     def call(self, inputs):
         with tf.name_scope(self.name):
-            return gen_math_ops.MatMul(a=inputs, b=self.kernels) + self.bias
+            return gen_math_ops.MatMul(a=self.kernels, b=inputs) + self.bias
         
     def get_config(self):
         return {

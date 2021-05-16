@@ -2,4 +2,4 @@
 **/.ipynb_checkpoints
 .vscode/
 images/
-saves/
+*saves/

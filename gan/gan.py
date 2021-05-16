@@ -5,6 +5,10 @@ import json
 from datetime import datetime
 from pathlib import Path
 import shutil
+import matplotlib
+import matplotlib.pyplot as plt
+
+matplotlib.use('Agg')
 
 from .gen import Generator
 from .dis import Discriminator
@@ -246,3 +250,24 @@ class WGAN(Model):
         ckpt = self.create_checkpoint()
         save_path = ckpt.save(folder_path / 'ckpt')
         print(f'Model saved at {save_path}')
+
+    def generate_images(self, save_path):
+        ''' Generate a set of images with the current generator and save them to path. '''
+        # generate samples
+        latent = tf.random.normal((10 * 10, 512))
+        if self.stage < 7:
+            images = self.generator_func(latent, training=False)
+        else:
+            images = []
+            for i in range(0, 100, 10):
+                images.append(self.generator_func(latent[i:i+10], training=False))
+            images = tf.concat(images, axis=0)
+        images = tf.clip_by_value((images + 1.0) / 2.0, 0.0, 1.0)
+        fig, ax = plt.subplots(10, 10, figsize=(30, 30))
+        for i in range(10):
+            for j in range(10):
+                ax[i][j].imshow(images[i * 10 + j])
+        fig.tight_layout()
+        # write to image
+        fig.savefig(save_path)
+        plt.close()
