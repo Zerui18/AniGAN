@@ -37,7 +37,7 @@ def main():
     # get model
     from gan.gan import WGAN
     if args.new:
-        model = WGAN({ 'stage' : 1, 'during_fadein' : False })
+        model = WGAN({ 'stage' : 1, 'during_fadein' : False, 'epoch' : -1 })
     elif args.load:
         check_dir(args.load)
         model = WGAN(checkpoint_path=args.load)
@@ -50,7 +50,7 @@ def main():
         sys.exit(-1)
 
     if args.mode in ['normal', 'extra']:
-        if not args.n_or_path.is_digit():
+        if not args.n_or_path.isdigit():
             print(f'<n_or_path> needs to be a number for mode {args.mode}!')
             sys.exit(-1)
         args.n_or_path = int(args.n_or_path)
@@ -61,8 +61,7 @@ def main():
                 model loaded at stage {model.stage} \
                 {"with" if model.config["during_fadein"] else "without"} fadein.')
         # perform remaining epochs if applicable
-        if not args.new:
-            model.fit_remaining_epochs()
+        model.fit_remaining_epochs()
         while model.stage < stage:
             model.one_growth_cycle()
         # save model

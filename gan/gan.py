@@ -210,18 +210,20 @@ class WGAN(Model):
     def fit_remaining_epochs(self):
         initial_epoch = self.config['epoch'] + 1
         during_fadein = self.config['during_fadein']
-        # first complete the remaining epochs during fadein
-        if initial_epoch <= self.n_epochs and during_fadein:
-            self.fit_n_epochs(self.n_epochs, initial_epoch=initial_epoch)
-        # after fadein, we still have a full self.n_epoch of tuning
         if during_fadein:
-            # remove fadein
-            print('Removed fade-in and re-stabilising.')
+            # first complete the remaining epochs during fadein
+            if initial_epoch <= self.n_epochs:
+                self.fit_n_epochs(self.n_epochs, initial_epoch=initial_epoch)
+            # after fadein, we still have a full self.n_epoch of tuning
             self.generator.remove_fadein()
             self.discriminator.remove_fadein()
+            print('Removed fade-in and re-stabilising.')
             self.compile()
             # stabilise
             self.fit_n_epochs(self.n_epochs)
+        else:
+            self.compile()
+            self.fit_n_epochs(self.n_epochs, initial_epoch=initial_epoch)
         
     def set_fadein_alpha(self, alpha):
         self.generator.set_fadein_alpha(alpha)
